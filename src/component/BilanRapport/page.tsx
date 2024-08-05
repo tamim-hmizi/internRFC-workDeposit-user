@@ -189,6 +189,7 @@ export default function BilanRapportPage() {
             >
               Modifier
             </Button>
+            <p style={{ fontSize: '0.875em', color: 'gray' }}>Drag and Drop la date que tu veux supprimer ou modifier</p>
           </Flex>
           <Link href="/FormUser">
             <Button leftIcon={<AddIcon />} colorScheme="green" variant="solid">

@@ -16,7 +16,7 @@ export default async function handler(req, res) {
                 Avancement: Avancement.toString(),
                 Tâche: Tâche,
                 File: File,
-                personId: 1,
+                personId: "arbia.sassi@esprit.tn",
             },
         };
 
@@ -29,7 +29,7 @@ export default async function handler(req, res) {
         }
     } else if (req.method === 'GET') {
         // Logique pour récupérer les rapports d'une personne spécifique
-        const personId = 1;
+        const personId = "arbia.sassi@esprit.tn";
 
         const params = {
             TableName: 'WorkRapport',

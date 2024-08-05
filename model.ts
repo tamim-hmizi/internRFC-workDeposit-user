@@ -4,7 +4,7 @@ export interface rapport {
     Theme: string,
     Tâche: String[],
     Date: string,
-    personId:number,
+    personId:string,
     File?: string
 
 }
