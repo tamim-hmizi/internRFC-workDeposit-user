@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: work-user-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: internRFC.com
+    http:
+      paths:
+      - path: /work
+        pathType: Prefix
+        backend:
+          service:
+            name: work-user-service
+            port:
+              number: 80
