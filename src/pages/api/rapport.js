@@ -2,20 +2,23 @@ import AWS from 'aws-sdk';
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
+function generateUniqueId() {
+    const now = Date.now();
+    return now;
+  }
 export default async function handler(req, res) {
     if (req.method === 'POST') {
         // Logique pour ajouter un rapport
-        const { Thème, Date, Avancement, Tâche, File } = req.body;
+        const { Thème, Date, Avancement, Tâche } = req.body;
 
         const params = {
             TableName: 'WorkRapport',
             Item: {
-                id: 4, // Assurez-vous de générer correctement l'ID
+                id: generateUniqueId(), 
                 Theme: Thème,
                 Date: Date,
                 Avancement: Avancement.toString(),
                 Tâche: Tâche,
-                File: File,
                 personId: "hmizitamim@hotmail.com",
             },
         };
@@ -28,7 +31,6 @@ export default async function handler(req, res) {
             res.status(500).json({ error: 'Failed to add rapport' });
         }
     } else if (req.method === 'GET') {
-        // Logique pour récupérer les rapports d'une personne spécifique
         const personId = "hmizitamim@hotmail.com";
 
         const params = {

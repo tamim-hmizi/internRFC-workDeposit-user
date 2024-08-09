@@ -12,13 +12,25 @@ import {
 import { useRef, useState } from "react";
 import SuccessDialog from '@/component/SuccessDialog/page'
 
-export default function RapportDialog({
+interface RapportDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  values: {
+    Thème: string;
+    Avancement: string;
+    Tâche: string;
+    Date: string;
+    //Fichier?: string;
+  };
+  onModify: (updatedValues: any) => void;
+}
+const RapportDialog: React.FC<RapportDialogProps> = ({
   isOpen: parentIsOpen, 
   onClose: parentOnClose, 
   values,
   onModify,
-}) {
-  const cancelRef = useRef();
+}) =>{
+  const cancelRef = useRef<HTMLButtonElement>(null);
   const [showSuccess, setShowSuccess] = useState(false);
 
   const submitRapport = async () => {
@@ -32,12 +44,8 @@ export default function RapportDialog({
       });
       const data = await response.json();
       console.log('Rapport added:', data);
-
-      // Close the current dialog and show the success message
       parentOnClose();
       setShowSuccess(true);
-
-      // Redirect after showing the success message for 3 seconds
       setTimeout(() => {
         setShowSuccess(false);
         window.location.href = '/BilanRapport';
@@ -73,6 +81,7 @@ export default function RapportDialog({
               <Text>
                 <strong>Tâche:</strong> {values.Tâche}
               </Text>
+              {/*}
               {values.Fichier && (
                 <Text>
                   <strong>Fichier:</strong>{" "}
@@ -81,6 +90,7 @@ export default function RapportDialog({
                   </a>
                 </Text>
               )}
+                */}
             </AlertDialogBody>
 
             <AlertDialogFooter>
@@ -106,3 +116,4 @@ export default function RapportDialog({
     </>
   );
 }
+export default RapportDialog;

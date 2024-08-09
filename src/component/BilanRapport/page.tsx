@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Button,
   AlertDialog,
@@ -20,19 +20,29 @@ import { ArrowForwardIcon, AddIcon, DeleteIcon, RepeatClockIcon } from '@chakra-
 import AlertDialogSuppression from '@/component/AlertDialogSuppression/page';
 import Link from 'next/link';
 
+export interface Report {
+  id: number,
+  Avancement: string,
+  Theme: string,
+  Tâche: string,
+  Date: string,
+  personId:string,
+  //File?: string
+}
 export default function BilanRapportPage() {
-  const [reports, setReports] = useState([]);
-  const [selectedReport, setSelectedReport] = useState(null);
+  const [reports, setReports] = React.useState<Report[]>([]);
+  const [selectedReport, setSelectedReport] =  useState<Report | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [reportToDelete, setReportToDelete] = useState(null);
+  const [reportToDelete, setReportToDelete] = useState<Report | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [editReport, setEditReport] = useState(null);
+  const [editReport, setEditReport] =  useState<Report | null>(null);
   const [editTheme, setEditTheme] = useState('');
   const [editAvancement, setEditAvancement] = useState('');
   const [editTache, setEditTache] = useState('');
 
+  const cancelRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     async function fetchReports() {
       try {
@@ -54,7 +64,7 @@ export default function BilanRapportPage() {
     fetchReports();
   }, []);
 
-  const handleDateClick = (report) => {
+  const handleDateClick = (report: Report) => {
     setSelectedReport(report);
     setIsDialogOpen(true);
   };
@@ -64,7 +74,7 @@ export default function BilanRapportPage() {
     setIsDialogOpen(false);
   };
 
-  const handleDeleteClick = (report) => {
+  const handleDeleteClick = (report: Report) => {
     setReportToDelete(report);
     setIsDeleteDialogOpen(true);
   };
@@ -76,12 +86,12 @@ export default function BilanRapportPage() {
 
   const handleConfirmDelete = async () => {
     try {
-      const response = await fetch(`/api/rapport/${reportToDelete.id}`, {
+      const response = await fetch(`/api/rapport/${reportToDelete?.id}`, {
         method: 'DELETE',
       });
 
       if (response.ok) {
-        const updatedReports = reports.filter((report) => report.id !== reportToDelete.id);
+        const updatedReports = reports.filter((report) => report.id !== reportToDelete?.id);
         setReports(updatedReports);
       } else {
         console.error('Failed to delete report:', response.status);
@@ -94,7 +104,7 @@ export default function BilanRapportPage() {
     }
   };
 
-  const handleEditClick = (report) => {
+  const handleEditClick = (report: Report) => {
     setEditReport(report);
     setEditTheme(report.Theme);
     setEditAvancement(report.Avancement);
@@ -112,7 +122,7 @@ export default function BilanRapportPage() {
 
   const handleEditSubmit = async () => {
     try {
-      const response = await fetch(`/api/rapport/${editReport.id}`, {
+      const response = await fetch(`/api/rapport/${editReport?.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -126,7 +136,7 @@ export default function BilanRapportPage() {
 
       if (response.ok) {
         const updatedReports = reports.map((report) =>
-          report.id === editReport.id
+          report.id === editReport?.id
             ? {
                 ...report,
                 Theme: editTheme,
@@ -145,21 +155,21 @@ export default function BilanRapportPage() {
     }
   };
 
-  const handleDragStart = (e, report) => {
+  const handleDragStart = (e: React.DragEvent<HTMLButtonElement>, report:Report) => {
     e.dataTransfer.setData('text/plain', JSON.stringify(report));
   };
 
-  const handleDragOver = (e) => {
+  const handleDragOver = (e: { preventDefault: () => void; }) => {
     e.preventDefault();
   };
 
-  const handleDropDelete = (e) => {
+  const handleDropDelete = (e: { preventDefault: () => void; dataTransfer: { getData: (arg0: string) => string; }; }) => {
     e.preventDefault();
     const droppedReport = JSON.parse(e.dataTransfer.getData('text/plain'));
     handleDeleteClick(droppedReport);
   };
 
-  const handleDropEdit = (e) => {
+  const handleDropEdit = (e: { preventDefault: () => void; dataTransfer: { getData: (arg0: string) => string; }; }) => {
     e.preventDefault();
     const droppedReport = JSON.parse(e.dataTransfer.getData('text/plain'));
     handleEditClick(droppedReport);
@@ -221,7 +231,7 @@ export default function BilanRapportPage() {
           </SimpleGrid>
         )}
 
-        <AlertDialog isOpen={isDialogOpen} onClose={handleCloseDialog}>
+        <AlertDialog isOpen={isDialogOpen} onClose={handleCloseDialog} leastDestructiveRef={cancelRef}>
           <AlertDialogOverlay />
           <AlertDialogContent>
             <AlertDialogCloseButton />
@@ -239,7 +249,7 @@ export default function BilanRapportPage() {
               <Text>
                 <strong>Tâche :</strong> {selectedReport?.Tâche}
               </Text>
-              {selectedReport?.File && (
+              {/*{selectedReport?.File && (
                 <Text>
                   <strong>Fichier :</strong>{' '}
                   <a href={selectedReport.File} target="_blank" rel="noopener noreferrer">
@@ -247,6 +257,7 @@ export default function BilanRapportPage() {
                   </a>
                 </Text>
               )}
+                */}
             </AlertDialogBody>
             <AlertDialogFooter>
               <Button onClick={handleCloseDialog}>Fermer</Button>
@@ -258,6 +269,7 @@ export default function BilanRapportPage() {
           isOpen={isEditDialogOpen}
           onClose={handleCloseEditDialog}
           motionPreset="slideInBottom"
+          leastDestructiveRef={cancelRef}
         >
           <AlertDialogOverlay />
           <AlertDialogContent>

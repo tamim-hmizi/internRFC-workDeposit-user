@@ -26,26 +26,48 @@ import {
 import { InfoIcon } from "@chakra-ui/icons";
 import { useState, useRef } from "react";
 import RapportDialog from "@/component/DataDialog/page";
-import FileUpload from "../pages/api/upload"; // Assuming this is correctly implemented
+import { String } from "aws-sdk/clients/appstream";
 
-const initValues = { Thème: "", Date: "", Avancement: "", Tâche: "", Fichier: "" };
+const initValues = { Thème: "", Date: "", Avancement: "", Tâche: ""};//, Fichier: "" };
 
 const initState = { isLoading: false, error: "", values: initValues };
 
+export interface Report{
+  Thème: string;
+  Avancement: string;
+  Tâche: string;
+  Date: string;
+  personId: string;
+}
+
+interface State {
+  values: {
+    [key: string]: string; 
+    Avancement: string; 
+  };
+}
+const initialStateA: State = {
+  values: {
+    Avancement: '0',
+  },
+};
+
+interface TouchedState {
+  [key: string]: boolean;
+}
 export default function Formulaire() {
   const [state, setState] = useState(initState);
-  const [touched, setTouched] = useState({});
+  const [touched, setTouched] = useState<TouchedState>({});
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [dateError, setDateError] = useState(""); // State for date error message
+  const [dateError, setDateError] = useState("");
   const cancelRef = useRef();
-  const [file, setFile] = useState<File>();
+  //const [file, setFile] = useState<File>();
 
   const { values, isLoading, error } = state;
 
-  const onBlur = async ({ target }) => {
-    setTouched((prev) => ({ ...prev, [target.name]: true }));
-
-    // Vérifiez la date si le champ de date est flouté
+  const onBlur = async (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { target } = event;
+    setTouched(prev => ({ ...prev, [target.name]: true }));
     if (target.name === "Date") {
       try {
         const response = await fetch('/api/rapport', {
@@ -67,7 +89,8 @@ export default function Formulaire() {
     }
   };
 
-  const handleChange = ({ target }) =>
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { target } = event;
     setState((prev) => ({
       ...prev,
       values: {
@@ -75,8 +98,9 @@ export default function Formulaire() {
         [target.name]: target.value,
       },
     }));
+  };
 
-  const handleNumberChange = (value) =>
+  const handleNumberChange = (value:String) =>
     setState((prev) => ({
       ...prev,
       values: {
@@ -85,7 +109,7 @@ export default function Formulaire() {
       },
     }));
 
-  const handleFileChange = (event) => {
+  /*const handleFileChange = (event) => {
     const selectedFile = event.target.files?.[0];
     setFile(selectedFile);
     setState((prev) => ({
@@ -96,7 +120,7 @@ export default function Formulaire() {
       },
     }));
   };
-
+*/
   const onSubmit = async () => {
     setIsDialogOpen(true);
   };
@@ -108,7 +132,7 @@ export default function Formulaire() {
   const onModify = () => {
     setIsDialogOpen(false);
   };
-
+/*
   const handleFileUpload = async (file) => {
     const formData = new FormData();
     formData.append('file', file);
@@ -136,7 +160,7 @@ export default function Formulaire() {
       console.error('Error uploading file:', error);
     }
   };
-
+*/
   return (
     <Container maxW="450px" mt={12}>
       <Center>
@@ -163,7 +187,7 @@ export default function Formulaire() {
         <FormErrorMessage><strong>Champs requis</strong></FormErrorMessage>
       </FormControl>
 
-      <FormControl isRequired isInvalid={(touched.Date && !values.Date) || dateError} mb={5}>
+      <FormControl isRequired isInvalid={!!(touched.Date && !values.Date) || !!dateError}  mb={5}>
         <FormLabel color="teal.600">Date</FormLabel>
         <Input
           type="date"
@@ -201,7 +225,6 @@ export default function Formulaire() {
       <FormControl isRequired isInvalid={touched.Tâche && !values.Tâche} mb={5}>
         <FormLabel color="teal.600">Tâches</FormLabel>
         <Textarea
-          type="text"
           name="Tâche"
           rows={4}
           errorBorderColor="red.300"
@@ -212,7 +235,8 @@ export default function Formulaire() {
         <FormErrorMessage><strong>Champs requis</strong></FormErrorMessage>
       </FormControl>
 
-      <FormControl mb={7}>
+      {/*<FormControl mb={7}>
+        
   <div style={{ display: 'flex', alignItems: 'center' }}>
     <FormLabel color="teal.600">Fichier</FormLabel>
     <Popover>
@@ -248,6 +272,7 @@ export default function Formulaire() {
     </Button>
   </div>
 </FormControl>
+*/}
 
       <Center mt={4}>
         <Button
